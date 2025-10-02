@@ -306,6 +306,9 @@
         // When user starts touching the screen
         window.addEventListener("touchstart", handleTouch);
         function handleTouch(e) {
+            if (e.target.closest('.blog-link') || e.target.closest('.circle-image')) {
+                return; // Let the click happen naturally
+            }
             e.preventDefault(); // Prevent default scrolling behavior
             window.addEventListener("touchmove", handleSwipe); // Listen for finger movement
             
@@ -333,6 +336,10 @@
 
         // When user stops touching the screen
         window.addEventListener("touchend", (e) => {
+            if (e.target.closest('.blog-link') || e.target.closest('.circle-image')) {
+                return; // Let the click happen
+            }
+
             e.preventDefault();
             window.removeEventListener("touchmove", handleSwipe); // Stop listening for movement
         });
