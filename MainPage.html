@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Nicole in New Zealand</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+
+    <style>
+        /* Reset all default browser styles to start with a clean slate */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; /* Makes width/height include padding and borders */
+            scroll-behavior: none;
+        }
+        
+
+        body {
+            font-family: 'Bitcount Prop Single', Impact, serif;
+            overflow: hidden; /* Hide scrollbars since we'll handle scrolling with drag */
+        }
+
+        /* The canvas element where we draw the background circles */
+        #canvas {
+            display: block;
+            z-index: 0; /* Behind the clickable elements */
+            cursor: grab; /* Show grab cursor when hovering */
+            background: url('https://i.pinimg.com/736x/1b/52/b8/1b52b88240a30b6cf8ba467ab9338893.jpg'); /* Space Image for background /* 
+            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */ /* Pretty gradient background OPTIONAL*/
+        }
+
+        /* Container for each blog post circle with image and title */
+        .blog-link {
+            position: absolute; /* Position relative to the viewport */
+            pointer-events: none; /* Initially not clickable (we'll enable when visible) */
+            text-align: center;
+            color: rgb(255, 255, 255);  /* text colour */
+            font-size: 35px; /* Made text bigger */
+            font-weight: 400;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8); /* Drop shadow for text readability */
+            transform: translate(-50%, -50%); /* Center the element on its position */
+            cursor: pointer;
+            z-index: 10; /* Above the canvas */
+            opacity: 0; /* Start invisible */
+            transition: opacity 0.2s ease; /* Smooth fade in/out */
+            width: 300px; /* Made bigger to match circle size */
+            height: 300px;
+            
+        }
+
+        /* When the blog link is close enough to center, make it visible and clickable */
+        .blog-link.visible {
+            opacity: 1;
+            pointer-events: all; /* Enable clicking */
+        }
+
+        /* The circular image styling */
+        .circle-image {
+            width: 300px; /* Made bigger to match circle size */
+            height: 300px;
+            border-radius: 50%; /* Makes it circular */
+            object-fit: cover; /* Crop image to fit circle without stretching */
+            border: none; /* no border */
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Blog title that appears below each circle */
+        .blog-title {
+            position: absolute;
+            bottom: -5px; /* Moved further down for bigger circles */
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+            max-width: 450px; 
+            font-size: 35px; 
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Show "..." if text is too long */
+            white-space: nowrap; /* Don't wrap to multiple lines */
+            background: rgba(0, 0, 0, 0); /* transparent black background */
+            padding: 3px 8px; /* Made padding bigger */
+            /* border-radius: 8px;  */ /* Rounded corners ONLY NEEDED IF VISIBLE */ 
+            /* backdrop-filter: blur(4px); */ /* Blur the background behind text OPTIONAL */
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas element for drawing the background circles -->
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // Get reference to the canvas element and its 2D drawing context
+        const canvas = document.querySelector("#canvas");
+        const ctx = canvas.getContext("2d"); // This lets us draw on the canvas
+        
+        // Travel blog data - each object represents one blog post
+        // You can customize this array with your own blog posts!
+        const blogData = [
+            { title: "First Few Days", image: "FirstFewDaysCover.jpg", url: "FirstFewDays.html", color: "#FF6B6B" },
+            { title: "Paris Cafes", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/paris", color: "#4ECDC4" },
+            { title: "NYC Street Food", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/nyc", color: "#45B7D1" },
+            { title: "Bali Beaches", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/bali", color: "#96CEB4" },
+            { title: "Rome History", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/rome", color: "#FFEAA7" },
+            { title: "Iceland Nature", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/iceland", color: "#DDA0DD" },
+            { title: "Morocco Souks", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/morocco", color: "#FFB347" },
+            { title: "Swiss Alps", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/switzerland", color: "#87CEEB" },
+            { title: "Thai Islands", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/thailand", color: "#98FB98" },
+            { title: "London Pubs", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/london", color: "#F0E68C" },
+            { title: "Barcelona Art", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/barcelona", color: "#FFB6C1" },
+            { title: "Dubai Luxury", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/dubai", color: "#FFA07A" },
+            { title: "Australian Outback", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/australia", color: "#CD853F" },
+            { title: "Canadian Rockies", image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200&h=200&fit=crop&crop=center", url: "/blog/canada", color: "#20B2AA" },
+            { title: "Brazilian Beaches", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/brazil", color: "#FFD700" },
+            { title: "Indian Spices", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=200&h=200&fit=crop&crop=center", url: "/blog/india", color: "#FF4500" },
+            { title: "Norwegian Fjords", image: "hhttps://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/norway", color: "#4682B4" },
+            { title: "Greek Islands", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/greece", color: "#00CED1" },
+            { title: "South African Safari", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg.jpg", url: "/blog/south-africa", color: "#DAA520" },
+            { title: "Chinese Culture", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/china", color: "#DC143C" },
+            { title: "Mexican Food", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=200&h=200&fit=crop&crop=center", url: "/blog/mexico", color: "#FF6347" },
+            { title: "Scottish Highlands", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/scotland", color: "#228B22" },
+            { title: "Egyptian Pyramids", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/egypt", color: "#DEB887" },
+            { title: "Peruvian Mountains", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/peru", color: "#8B4513" },
+            { title: "Vietnamese Street Food", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/vietnam", color: "#32CD32" },
+            { title: "Turkish Baths", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/turkey", color: "#B22222" },
+            { title: "Irish Countryside", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/ireland", color: "#228B22" },
+            { title: "Korean Culture", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/korea", color: "#FF1493" },
+            { title: "Russian Architecture", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/russia", color: "#800080" },
+            { title: "Portuguese Coast", image: "https://static.vecteezy.com/system/resources/thumbnails/000/696/278/small/textured-black-background.jpg", url: "/blog/portugal", color: "#FF8C00" }
+        ];
+
+        // Variables to store mouse/touch positions and movement
+        var mouseX = 0,
+            mouseY = 0,
+            circles = [], // Array to store circle data (position, color, etc.)
+            blogLinks = [], // Array to store HTML elements for clickable links
+            centerX, centerY, // Center point of the screen
+            startX, startY, // Where the user started dragging
+            offsetX, offsetY, // Current offset (how far we've moved the grid)
+            oldOffsetX, oldOffsetY, // Previous offset (saved when drag starts)
+            scale, // Used for scaling circles based on distance
+            i, j, // Loop counters
+            x, y, // Used for positioning circles in grid
+            // Configuration constants - you can adjust these!
+            HORIZONTAL = 1, // Number of circles horizontally
+            VERTICAL = 1,   // Number of circles vertically  
+            RADIUS = 150,    // Size of each circle (made bigger!)
+            PADDINGX = 25,  // Horizontal space between circles
+            PADDINGY = 25,  // Vertical space between circles
+            SCALE_FACTOR = 800; // Controls how fast circles shrink with distance (higher = shrink slower)
+
+        // Set canvas to full browser window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Calculate center point of screen
+        centerX = canvas.width / 2;
+        centerY = canvas.height / 2;
+
+        // Calculate starting position to center the grid of circles
+        // This math centers the entire grid in the middle of the screen
+        offsetX = (canvas.width - (RADIUS * 2 * HORIZONTAL + PADDINGX * (HORIZONTAL - 1))) / 2 + RADIUS;
+        offsetY = (canvas.height - (RADIUS * 2 * VERTICAL + PADDINGY * (VERTICAL - 1))) / 2 + RADIUS;
+
+        // Create the grid of circles and corresponding HTML elements
+        x = 0; // Starting x position
+        y = 0; // Starting y position
+        let blogIndex = 0; // Track which blog post we're on
+
+        // Nested loops to create a grid pattern
+        for (i = 0; i < VERTICAL; i++) { // For each row
+            for (j = 0; j < HORIZONTAL; j++) { // For each column
+                // Only create circles if we have blog data for them
+                if (blogIndex < blogData.length) {
+                    const blog = blogData[blogIndex];
+                    
+                    // Add circle data to our array
+                    circles.push({ 
+                        x: x,           // X position in the grid
+                        y: y,           // Y position in the grid
+                        color: blog.color, // Background color
+                        blogIndex: blogIndex // Reference to blog data
+                    });
+
+                    // Create the HTML element that users can click on
+                    const linkElement = document.createElement('div');
+                    linkElement.className = 'blog-link';
+                    
+                    // Set the HTML content (image and title)
+                    linkElement.innerHTML = `
+                        <img class="circle-image" src="${blog.image}" alt="${blog.title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iNjAiIGZpbGw9IiM2NjdlZWEiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CjxwYXRoIGQ9Im0xIDEyIDUgNUwxNyA2Ii8+Cjwvc3ZnPgo8L3N2Zz4K'">
+                        <div class="blog-title">${blog.title}</div>
+                    `;
+                    
+                    // Add click event listener - what happens when user clicks
+                    linkElement.addEventListener('click', () => {
+                        window.location.href = blog.url;
+                    });
+
+                    // Add the element to the page
+                    document.body.appendChild(linkElement);
+                    
+                    // Store reference to the element and which circle it belongs to
+                    blogLinks.push({
+                        element: linkElement,
+                        circleIndex: circles.length - 1 // Index of corresponding circle
+                    });
+
+                    blogIndex++; // Move to next blog post
+                }
+                x += RADIUS * 2 + PADDINGX; // Move to next column position
+            }
+            
+            // Create honeycomb/offset pattern - alternate rows are shifted
+            if (i % 2 == 0) { // Even rows (0, 2, 4...)
+                x = PADDINGX / 2 + RADIUS; // Shift right
+            } else { // Odd rows (1, 3, 5...)
+                x = 0; // Start at left edge
+            }
+            y += RADIUS * 2 + PADDINGY; // Move to next row
+        }
+
+        /**
+         * Main drawing function - called continuously to update the display
+         * This is the "game loop" that redraws everything 60 times per second
+         */
+        function draw() {
+            // Clear the entire canvas (like erasing a whiteboard)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Save the current drawing state
+            ctx.save();
+            
+            // Move the drawing origin based on user dragging
+            ctx.translate(offsetX, offsetY);
+
+            // Update all the clickable HTML elements
+            blogLinks.forEach(link => {
+                const circle = circles[link.circleIndex]; // Get corresponding circle data
+                const scale = getDistance(circle); // Calculate how big it should be
+                
+                // Only show elements that are big enough (close to center)
+                if (scale > 0.3) {
+                    // Calculate screen position (circle position + offset)
+                    const screenX = circle.x + offsetX;
+                    const screenY = circle.y + offsetY;
+                    
+                    // Position the HTML element
+                    link.element.style.left = screenX + 'px';
+                    link.element.style.top = screenY + 'px';
+                    
+                    // Scale the element based on distance from center
+                    link.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    
+                    // Make it visible and clickable
+                    link.element.classList.add('visible');
+                } else {
+                    // Hide elements that are too far from center
+                    link.element.classList.remove('visible');
+                }
+            });
+
+            // Draw the background circles on the canvas
+            // (Removed - now we only show the images without colored backgrounds)
+            ctx.restore(); // Restore main drawing state
+            
+            // Schedule next frame - this creates smooth animation
+            requestAnimationFrame(draw);
+        }
+
+        /**
+         * Calculate how big a circle should be based on distance from center
+         * This creates the "sphere" effect where circles shrink as they move away
+         */
+        function getDistance(circle) {
+            var dx, dy, dist;
+            // Calculate distance from circle to screen center
+            dx = circle.x - centerX + offsetX;
+            dy = circle.y - centerY + offsetY;
+            dist = Math.sqrt(dx * dx + dy * dy); // Pythagorean theorem
+            
+            // Convert distance to scale (1 = full size, 0 = invisible)
+            scale = 1 - dist / SCALE_FACTOR;
+            scale = scale > 0 ? scale : 0; // Don't allow negative scale
+            return scale;
+        }
+
+        /**
+         * Make a color lighter or darker
+         * Used to create gradient effects on circles
+         */
+        function shadeColor(color, percent) {
+            const f = parseInt(color.slice(1), 16); // Convert hex to number
+            const t = percent < 0 ? 0 : 255;
+            const p = percent < 0 ? percent * -1 : percent;
+            const R = f >> 16; // Extract red component
+            const G = f >> 8 & 0x00FF; // Extract green component
+            const B = f & 0x0000FF; // Extract blue component
+            return "#" + (0x1000000 + (Math.round((t - R) * p / 100) + R) * 0x10000 + (Math.round((t - G) * p / 100) + G) * 0x100 + (Math.round((t - B) * p / 100) + B)).toString(16).slice(1);
+        }
+
+        // === TOUCH EVENT HANDLING (for mobile devices) ===
+        
+        // When user starts touching the screen
+        window.addEventListener("touchstart", handleTouch);
+        function handleTouch(e) {
+            e.preventDefault(); // Prevent default scrolling behavior
+            window.addEventListener("touchmove", handleSwipe); // Listen for finger movement
+            
+            // Remember where the touch started
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            
+            // Save current offset so we can add to it
+            oldOffsetX = offsetX;
+            oldOffsetY = offsetY;
+        }
+
+        // When user moves their finger while touching
+        function handleSwipe(e) {
+            e.preventDefault(); // Prevent scrolling
+            
+            // Get current finger position
+            mouseX = e.changedTouches[0].clientX;
+            mouseY = e.changedTouches[0].clientY;
+            
+            // Calculate how far finger has moved and update offset
+            offsetX = oldOffsetX + mouseX - startX;
+            offsetY = oldOffsetY + mouseY - startY;
+        }
+
+        // When user stops touching the screen
+        window.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            window.removeEventListener("touchmove", handleSwipe); // Stop listening for movement
+        });
+
+        // === MOUSE EVENT HANDLING (for desktop) ===
+        
+        // When user clicks and holds mouse button
+        window.addEventListener("mousedown", handleClick);
+        function handleClick(e) {
+            // Start listening for mouse movement and release
+            window.addEventListener("mousemove", handleMouse);
+            window.addEventListener("mouseup", handleRelease);
+            
+            // Remember where click started
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            // Save current offset
+            oldOffsetX = offsetX;
+            oldOffsetY = offsetY;
+            
+            // Change cursor to show we're dragging
+            canvas.style.cursor = "grabbing";
+        }
+
+        // When user moves mouse while holding button
+        function handleMouse(e) {
+            // Get current mouse position
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Calculate movement and update offset
+            offsetX = oldOffsetX + mouseX - startX;
+            offsetY = oldOffsetY + mouseY - startY;
+        }
+
+        // When user releases mouse button
+        function handleRelease() {
+            // Stop listening for movement
+            window.removeEventListener("mouseup", handleRelease);
+            window.removeEventListener("mousemove", handleMouse);
+            
+            // Change cursor back to grab
+            canvas.style.cursor = "grab";
+        }
+
+        // === WINDOW RESIZE HANDLING ===
+        
+        // When browser window is resized, update canvas and center point
+        window.addEventListener("resize", () => {
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+        });
+
+        // Start the animation loop!
+        draw();
+    </script>
+</body>
+</html>
