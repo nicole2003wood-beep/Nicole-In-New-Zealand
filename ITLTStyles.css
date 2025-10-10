@@ -1,0 +1,209 @@
+* {
+    font-family: "Fraunces", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+:root{
+    --banner-color: #5b8f63;
+}
+
+
+.title h1 {
+    font-family: "Princess Sofia", "Fraunces", sans-serif;
+    font-style: bold;
+    
+}
+.banner{
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: 1;
+    color: black;
+    background-color: var(--banner-color);
+    align-items: center;
+    flex-grow: 1fr 1fr 1fr;
+    flex: 1fr 3fr 1fr;
+    justify-items: center;
+
+    
+
+}
+#home{
+    color:black;
+    grid-column: 1 / span 1;
+
+}
+#home:hover{
+    color: #FF00FF;
+}
+#banner-title{
+    color: #023008;
+    font-size: 25px;
+    font-weight: bold;
+    grid-column: 5 / span 2;
+}
+.banner a:hover{
+    color: #FF00FF;
+}
+
+#last {
+    grid-column: 10 / span 1;
+}
+#next {
+    grid-column: 11 / span 1;
+}
+.title {
+    display: flex;
+    justify-content: center;
+    font-size: 4rem;
+    align-items: flex-start;
+    border-bottom: 2rem solid var(--banner-color);
+    text-shadow: 1px 1px rgba(209, 203, 203, 0.584);
+    line-height: 0.5; 
+    padding: 0.01%;
+    background-image: url('LakeTekapoBanner.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.paragraphs {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(100px, 20);
+    gap: 1px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    font-style: italic;
+
+   
+}
+
+
+.paragraphs p {
+    padding: 15px;
+    background-color: #fff;
+    font-size: 2rem;
+    font-style: italic;
+
+}
+
+.paragraphs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+}
+
+/* Video */
+.paragraphs video {
+    width: 100%;
+    height: auto;
+  
+}
+#par1 {
+    grid-column: 1 / 13;
+    grid-row: 1 / 2;
+    border-left: 0.2rem dotted var(--banner-color);
+    border-right: 0.2rem dotted var(--banner-color);
+    align-self: center;
+}
+
+
+#par2 {
+    grid-column: 1 / 8;
+    grid-row: 4 / 5;
+    border-left: 0.2rem double var(--banner-color);
+}
+.paragraphs img[src*='TopOfHillGround'] {
+    grid-column: 8 / 13;
+    grid-row: 4 / 5;
+}
+.paragraphs img[src*='MountainRange'] {
+    grid-column: 1 / 9;
+    grid-row: 5 / 6;
+}
+.paragraphs img[src*='TopOfHillLake'] {
+    grid-column: 9 / 13;
+    grid-row: 5 / 7;
+}
+#par3 {
+    grid-column: 1 / 9;
+    grid-row: 6 / 7;
+    border-left: 0.2rem double var(--banner-color);
+}
+.paragraphs video {
+    grid-column: 3 / 11;
+    grid-row: 7 / 8;
+    height: 30rem;
+}
+ .footer {
+    text-align: center;
+    color: black;
+    background-color: var(--banner-color);
+    justify-content: center;
+    font-weight: 200
+ }
+ 
+ .footer h2 {
+    color: #023008;
+    border-bottom: 0.1rem solid #023008;
+
+ }
+ .footer p {
+    color: #264331;
+    
+ }
+ .flip-box {
+  background-color: transparent;
+  grid-column: 1 / 13;
+  grid-row: 2 / 4;
+  height: 40rem;
+  width: 70rem;
+  border: 1px solid #f1f1f1;
+  justify-self: center;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+ }
+ .flip-box-inner {
+  position: relative;
+  grid-column: 1 / 13;
+  grid-row: 2 / 4;
+  height: 40rem;
+  width: 70rem;
+  text-align: center;
+
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+/* Do an horizontal flip when you move the mouse over the flip box container */
+.flip-box:hover .flip-box-inner {
+  transform: rotateY(180deg);
+}
+/* Position the front and back side */
+.flip-box-front, .flip-box-back {
+  position: absolute;
+  grid-column: 1 / 13;
+  grid-row: 2 / 4;
+  height: 40rem;
+  width: 70rem;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+/* Style the front side */
+.flip-box-front {
+  background-image: url('LakeTekapo.jpg');
+  color: black;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Style the back side */
+.flip-box-back {
+  background-image: url('DuskLake.jpg');
+  color: black;
+  transform: rotateY(180deg);
+  background-size: cover;
+  background-position: center;
+}
