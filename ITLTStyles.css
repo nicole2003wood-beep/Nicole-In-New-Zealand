@@ -53,6 +53,14 @@
 #next {
     grid-column: 11 / span 1;
 }
+@media only screen and (max-width: 600px) {
+    .banner {grid-template-rows: 2;
+            grid-template-columns: repeat(3, 1fr);}
+    #home{grid-area: 2 / 2 / span 1 / span 1;}
+    #banner-title{grid-area: 1 / 1 / span 1 / span 3;}
+    #last{grid-area: 2 / 1 / span 1 / span 1;}
+    #next{grid-area: 2 / 3 / span 1 / span 1;}
+}
 .title {
     display: flex;
     justify-content: center;
@@ -207,3 +215,4 @@
   background-size: cover;
   background-position: center;
 }
+
