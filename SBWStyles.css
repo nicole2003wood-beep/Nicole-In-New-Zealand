@@ -77,7 +77,7 @@
     text-shadow: 1px 1px rgba(209, 203, 203, 0.584);
     line-height: 0.5; 
     padding: 1%;
-    background-image: url('SnowBanner.jpg');
+    background-image: url('SBWBanner.jpg');
     background-size: cover;
     background-position: bottom;
 }
@@ -230,3 +230,4 @@
     color: #264331;
     
  }
+
